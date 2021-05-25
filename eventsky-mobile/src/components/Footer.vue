@@ -1,12 +1,16 @@
 <template>
     <div>
-         <el-button type="primary" class="register">报名</el-button>
+         <el-button type="primary" class="register" @click="login">报名</el-button>
     </div>
 </template>
 
 <script>
     export default {
-        
+        methods:{
+            login(){
+                this.$router.push('/login')
+            }
+        }
     }
 </script>
 

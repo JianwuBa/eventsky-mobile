@@ -19,7 +19,21 @@ const router = new VueRouter({
                     import ("@/views/home/index"),
             }]
         },
-
+        {
+            path: '/signup',
+            component: () =>
+                import ('@/views/login/signup')
+        },
+        {
+            path: '/login',
+            component: () =>
+                import ('@/views/login/login')
+        },
+        {
+            path: '/payment',
+            component: () =>
+                import ('@/views/payment/payment')
+        }
 
     ]
 })

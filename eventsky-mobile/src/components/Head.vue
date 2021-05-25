@@ -53,6 +53,7 @@
     box-sizing: border-box;
     justify-content: space-between;
     align-items: center;
+     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
     .left{
       .logo{
         height: 26px;
