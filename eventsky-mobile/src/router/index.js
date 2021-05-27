@@ -32,7 +32,17 @@ const router = new VueRouter({
         {
             path: '/payment',
             component: () =>
-                import ('@/views/payment/payment')
+                import ('@/views/payment/payment'),
+            children: [{
+                path: "/payment/*",
+                component: () =>
+                    import ("@/views/payment/payment"),
+            }]
+        },
+        {
+            path: '/client',
+            component: () =>
+                import ('@/views/client/index')
         }
 
     ]

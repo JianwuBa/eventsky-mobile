@@ -2,17 +2,17 @@
     <div class="container">
         <Head :logoUrl="logoUrl" class="head"></Head>
         <div class="top">
-            <p class="name">2021国际能源发展高峰论坛- 伙伴坛- 伙伴专用坛- 伙伴专用专用报名</p>
+            <p class="name">{{eventTit}}</p>
             <div class="date">
                 <img src="../../assets/images/eventicon.png" alt="">
-                <p class="time">2017年9月18日 星期一 09:00 至 24日 星期日 18:00</p>
+                <p class="time">{{eventTime}}</p>
             </div>
         </div>
         <section class="middle-tic">
             <h5 class="sec-tit">门票信息</h5>
-            <div class="sec-content">
-                <p class="name">Festival Ticket 音乐节门票 </p>
-                <p class="price">售价：¥ 598</p>
+            <div class="sec-content" v-for="(item ,index) in ticArr" :key="index">
+                <p class="name">{{item.title}} </p>
+                <p class="price">售价：{{item.currency | filterCurrency}} {{item.amount}}</p>
             </div>
         </section>
         <section class="middle-info">
@@ -31,6 +31,18 @@
                     <el-form-item label="职位" prop="position" >
                         <el-input v-model="infoForm.position" ></el-input>
                     </el-form-item>
+                    
+                    <el-row v-for="(item,idx) in infoForm.questionList" :key="idx">
+                        <el-col :span="24" >
+                            <el-form-item 
+                            :label="item.type"  
+                            :rules="rules.qsname" 
+                            :prop="`questionList.${idx}.qsname`"  
+                            >
+                                <el-input v-model="item.qsname"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
                     <el-form-item label="留言" prop="message" >
                         <el-input v-model="infoForm.message" ></el-input>
                     </el-form-item>
@@ -38,7 +50,7 @@
                         <div class="payment">
                             <p class="type">
                                 <span>总计</span>
-                                <span class="num">¥598</span>
+                                <span class="num">{{ticArr[0].currency | filterCurrency}} {{ticArr[0].amount}}</span>
                             </p>
                         </div>
                     </el-form-item>
@@ -46,8 +58,6 @@
                         <el-button class="payment-btn" @click="submitForm('infoForm')" >付款</el-button>
                     </el-form-item>
                 </el-form>
-
-                
             </div>
         </section>
     </div>
@@ -57,15 +67,31 @@
 import Head from '../../components/Head'
     export default {
         data(){
-            
             return{
+                //活动id
+                eventId:'',
+                //活动名称 时间  
+                eventTit:'',
+                eventTime:'',
+                //门票列表 报名问题列表
+                ticArr:'',
+                //主办方logo
                 logoUrl:'',
+                //门票ID
+                ticId:'',
+                //订单号
+                orderNo:'',
                 infoForm:{
                     name:'',
                     email:'',
                     compony:'',
                     position:'',
-                    message:''
+                    message:'',
+                    questionList:[{
+                        qsname:'',
+                        type:'',
+                        id:''
+                    }],
                 },
                 rules: {
                     name: [
@@ -83,30 +109,99 @@ import Head from '../../components/Head'
                     message: [
                         { required: false, message: '请填写留言', trigger: 'blur' },
                     ],
+                    qsname: [
+                        { required: true, message: '内容不能为空', trigger: 'blur' },
+                    ]
+                    
                 }
             }
         },
         components:{
             Head,
         },
-        created(){
-            this.getAccountInfo()
+        
+        filters:{
+            filterCurrency(val){
+                if(val === "人民币"){
+                    return '¥'
+                }else{
+                    return '$'
+                }
+            },
         },
         methods:{
             getAccountInfo(){
-                console.log(1)
+                this.$http.get('/event-service/event/info/'+this.eventId).then(res => {
+                    if(res.data.rspCode == '1'){
+                        let data = res.data.data
+                        console.log(data)
+                        this.logoUrl = data.logoUrl
+                        this.eventTit=data.title
+                        this.eventTime=data.beginDate
+                        this.ticArr = data.priceList
+                        this.infoForm.questionList = data.questionList
+                        this.ticId = data.id
+                        let questionArr = []
+                        this.infoForm.questionList.forEach(function (item) {  
+                            if(item.type == 'SOCIAL_WECHAT') item.type = '微信'
+                            if(item.type == 'SOCIAL_LINKEDIN') item.type = '领英'
+                            if(item.type == 'SOCIAL_DINGDING') item.type = '丁丁'
+                            if(item.type == 'SOCIAL_ZHIHU') item.type = '知乎'
+                            questionArr.push({'qsname':'','type':item.type,'id':item.id})
+                        })
+                        this.infoForm.questionList = questionArr
+                    }
+                    
+                })
+            },
+            //订单信息及自定义问题 信息
+            paymentForm(){
+                let arr = [
+                    {"titleKey":"name","title":"姓名","content":this.infoForm.name},
+                    {"titleKey":"email","title":"邮箱","content":this.infoForm.email},
+                    {"titleKey":"company","title":"公司","content":this.infoForm.compony},
+                    {"titleKey":"position","title":"职位","content":this.infoForm.position},
+                ]
+                this.infoForm.questionList.forEach(function(item){
+                    arr.push({"titleKey":item.id,"title":(item.type),"content":item.qsname})
+                })
+                return arr 
+            },
+            //提交订单信息
+            createOrder(){
+                let obj = {
+                    webId:this.eventId,
+                    items:this.ticId,
+                    qvs:JSON.stringify(this.paymentForm()),
+                    remark:this.infoForm.message
+                }
+                return obj
             },
             submitForm(formName) {
+                const formData = new FormData();
+                Object.keys(this.createOrder()).forEach((key) => {
+                    formData.append(key, this.createOrder()[key]);
+                });
+                
+                
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        alert('submit!');
+                       this.$http.post("/order-service/order/create",formData).then(res =>{
+                            if(res.data.rspCode == 1){
+                                this.orderNo = res.dadta.orderNo
+                            }
+                        })
                     } else {
                         console.log('error submit!!');
                         return false;
                     }
                 });
             },
-        }
+        },
+        created(){
+            this.eventId = this.$route.params.pathMatch
+            this.getAccountInfo()
+        },
     }
 </script>
 

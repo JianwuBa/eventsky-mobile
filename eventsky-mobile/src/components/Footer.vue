@@ -8,7 +8,16 @@
     export default {
         methods:{
             login(){
-                this.$router.push('/login')
+                let eventId = this.$route.params.pathMatch
+                this.$http.get("/user-service/account/current").then(res => {
+                    console.log(res)
+                    if(res.data.rspCode == "400002"){
+                        this.$router.push('/login')
+                    }else if(res.data.rspCode == "1"){
+                        this.$router.push('/payment/'+eventId+'')
+                    }
+                })
+                //this.$router.push('/login')
             }
         }
     }
