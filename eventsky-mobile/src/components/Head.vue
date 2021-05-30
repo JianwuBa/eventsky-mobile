@@ -1,24 +1,24 @@
 <template>
   <div>
-    <header>
-      <div class="left">
-          <div class="logo">
-            <img :src="logoUrl" alt="">
+      <header>
+          <div class="left">
+            <div class="logo">
+                  <img :src="logoUrl" alt="">
+              </div>
           </div>
-      </div>
-      <div class="right">
-        <div class="my-event">
-          <van-icon name="contact" class="contact" />
-          <span>我的活动</span>
-          
-        </div>
-        <div class="lang">
-          <span @click="changeLang('zh')">中</span>
-          <span>|</span>
-          <span @click="changeLang('en')">EN</span>
-        </div>
-      </div>
-    </header>
+          <div class="right">
+            <div class="my-event">
+              <van-icon name="contact" class="contact" />
+              <span>我的活动</span>
+              
+            </div>
+            <div class="lang">
+              <span @click="changeLang('zh')">中</span>
+              <span>|</span>
+              <span @click="changeLang('en')">EN</span>
+            </div>
+          </div>
+      </header>
   </div>
 </template>
 

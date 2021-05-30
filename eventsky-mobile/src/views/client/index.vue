@@ -10,42 +10,35 @@
         <section class="sec-live">
             <h4 class="sec-tit">我参与的活动直播（{{totalLives}}）</h4>
             <ul class="live-list">
-                <li class="live" v-for="(item,index) in liveArr" :key="index">
-                    <div class="top">
-                        {{eventsLists[item.goodsId].title}}
-                        <p class="name"></p>
+                <li class="live" v-for="(item,index) in liveArr" :key="index" >
+                    <div class="top" v-if="eventsLists[item.goodsId]">
+                        <p class="name">{{eventsLists[item.goodsId]["title"]}}</p>
                         <p class="date">
                             <img src="../../assets/images/eventicon.png" alt="">
-                            <span>时间：2018年1月9日 周二 21:00-周五 23:45</span>
+                            <span >时间：{{eventsLists[item.goodsId]["beginDate"]}}</span>
                         </p>
                         <div class="bottom">
                             <div class="left">
                                 <p class="sponsor">
                                     <img src="../../assets/images/eventicon.png" alt="">
-                                    <span>主办：北京恒知动奇科技有限公司</span>
+                                    <span>主办：{{eventsLists[item.goodsId]["company"]}}</span>
                                 </p>
                                 <p class="link">
                                     <img src="../../assets/images/eventicon.png" alt="">
-                                    <span>活动链接： <a href="https://fEventSky.cn/1581102859">https://fEventSky.cn/1581102859</a> </span>
+                                    <span>活动链接： <a :href="link+eventsLists[item.goodsId]['webId']">http://eventsky.cn/{{eventsLists[item.goodsId]["webId"]}}</a> </span>
                                 </p>
                             </div>
-                            <div class="right">
-                                <img src="../../assets/images/code.png" alt="">
+                            <div class="right" @click="showCodePopup(eventsLists[item.goodsId]['barcodeUrl'])">
+                                <img :src="eventsLists[item.goodsId]['barcodeUrl']" alt="">
                             </div>
-                        </div>
-                    </div>
-                    <div class="middle">
-
-                    </div>
-                    <div class="sign-in">
-                        <div class="sign-in-btn">
-                            <span class="txt">签到密码：</span>
-                            <span class="code">TY231341</span>
                         </div>
                     </div>
                 </li>
             </ul>
         </section>
+        <van-popup v-model="showCode" closeable position="bottom" :style="{ height: '50%' }">
+            <van-image width="70%" height="70%" style="margin:15% auto 0;display:block" :src="codeUrl"/>
+        </van-popup>
     </div>
 </template>
 
@@ -57,7 +50,6 @@ import Head from '../../components/Head'
         },
         data(){
             return{
-                logoUrl:'',
                 headerUrl:'https://img01.yzcdn.cn/vant/cat.jpeg',
                 //参与的直播数组
                 liveArr:[],
@@ -67,35 +59,44 @@ import Head from '../../components/Head'
                 goodsId:[],
                 // 活动信息 列表
                 eventsLists:{},
+                showCode:false,
+                link:'http://eventsky.cn/',
+                codeUrl:'',
+                logoUrl: require('../../assets/images/logo-blue.png')
             }
         },
         
         methods:{
-            getclientInfo(){
-                this.$http.get("/order-service/order/mine").then(res =>{
-                    let data = res.data.data
-                    this.liveArr = data.results
-                    this.totalLives = data.totalRows
+            showCodePopup(url){
+                this.showCode = true
+                this.codeUrl = url
+            },
+            async getclientInfo(){
+                await this.$http.get("/order-service/order/mine").then(orderRes =>{
+                    const orderData =  orderRes.data.data
+                    this.liveArr = orderData.results
+                    this.totalLives = orderData.totalRows
                     this.liveArr.forEach(item => {
                         this.goodsId.push(item.goodsId) 
                     })
-                    console.log(this.liveArr)
-                    this.$http.get("/event-service/event/list/",{params:{eventId:this.goodsId.toString()}}).then(res => {
-                        // console.log(res)
-                        res.data.data.forEach((item) =>{
-                             console.log(item)
-                            this.eventsLists[item.id] = item
-                        })
-                        console.log(this.eventsLists)
-                    })
+                    // console.log(this.liveArr)
                 })
-            }
+                await this.$http.get("/event-service/event/list/",{params:{eventId:this.goodsId.toString()}}).then(eventRes => {
+                    // console.log(res)
+                    const eventData =  eventRes.data.data
+                    let list = {}
+                    eventData.forEach((item) =>{
+                        //  console.log(item)
+                        list[item.id] = item
+                    })
+                    this.eventsLists = list
+                })
+            },
         },
         created(){
             this.getclientInfo()
-            // this.getclientEventInfo()
         },
-    }
+}
 </script>
 
 <style lang="less" scoped>
@@ -140,12 +141,13 @@ import Head from '../../components/Head'
         background: #F2F3F7;
         padding: 10px 14px 20px;
         .live{
-            
             box-shadow: 0px 2px 4px 0px #A0A0A0;
             overflow: hidden;
             border-radius: 8px;
+            margin-bottom: 20px;
             .top{
-                padding: 13px;background: #FFFFFF;
+                padding: 13px 13px 10px;
+                background: #FFFFFF;
             }
             .name{
                 font-size: 16px;
@@ -217,32 +219,7 @@ import Head from '../../components/Head'
                     }
                 }
             }
-            .sign-in{
-               padding: 13px;background: #FFFFFF;
-            }
-            .sign-in-btn{
-                width: 70%;
-                background: linear-gradient(180deg, #82BBFF 0%, #197DF4 100%);
-                border-radius: 3px;
-                text-align: center;
-                margin: 0 auto;
-                .txt{
-                    font-size: 14px;
-                    color: #fff;
-                    line-height: 36px;
-                }
-                .code{
-                    display: inline-block;
-                    padding: 0 15px;
-                    background: #E1EEFD;
-                    line-height: 20px;
-                    vertical-align: middle;
-                    color: #4A4A4A;
-                    font-size: 12px;
-                }
-            }
         }
-        
     }
 }
 </style>
