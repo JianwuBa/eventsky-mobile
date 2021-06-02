@@ -44,6 +44,8 @@
 
 <script>
 import Head from '../../components/Head'
+import {getclientOrder} from '@/api/orderService'
+import {getclientEvent} from '@/api/eventService'
     export default {
         components:{
             Head,
@@ -72,7 +74,8 @@ import Head from '../../components/Head'
                 this.codeUrl = url
             },
             async getclientInfo(){
-                await this.$http.get("/order-service/order/mine").then(orderRes =>{
+                // await this.$http.get("/order-service/order/mine").then(orderRes =>{
+                    await getclientOrder().then(orderRes =>{
                     const orderData =  orderRes.data.data
                     this.liveArr = orderData.results
                     this.totalLives = orderData.totalRows
@@ -81,7 +84,8 @@ import Head from '../../components/Head'
                     })
                     // console.log(this.liveArr)
                 })
-                await this.$http.get("/event-service/event/list/",{params:{eventId:this.goodsId.toString()}}).then(eventRes => {
+                // await this.$http.get("/event-service/event/list/",{params:{eventId:this.goodsId.toString()}}).then(eventRes => {
+                    await getclientEvent({eventId:this.goodsId.toString()}).then(eventRes =>{
                     // console.log(res)
                     const eventData =  eventRes.data.data
                     let list = {}

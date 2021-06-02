@@ -25,7 +25,8 @@
 <script>
 import {langEn,langZh} from '@/api/lang.js'
 import { Toast } from 'vant';
-// import api from '@/api/api'
+// import {postLogin} from "@/api/"
+import {postLogin} from '@/api/userService'
     export default {
         data(){
             return{
@@ -73,7 +74,8 @@ import { Toast } from 'vant';
                 this.$router.push('/signup')
             },
             registerAccount(){
-                this.$http.post("/user-service/account/login_p?phone="+this.phone+"&authCode="+this.sms+"").then(res =>{
+                // this.$http.post("/user-service/account/login_p?phone="+this.phone+"&authCode="+this.sms+"").then(res =>{
+                    postLogin(this.phone,this.sms).then(res => {
                     if(res.data.rspCode == 1){
                         setTimeout(()=>{
                             this.$router.push('/payment')

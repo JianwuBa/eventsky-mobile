@@ -60,17 +60,19 @@
 <script>
 import Head from '../../components/Head'
 import Footer from '../../components/Footer'
-// import api from '@/api/api'
+import {getEventInfo} from '@/api/eventService'
   export default {
     data(){
       return{
         show:false,
+        //活动链接
         url:'http://192.168.1.216:8080/#',
         showEventDetail:false,
         showArrow:null,
         bannelUrl:'',
         title:'',
         beginDate:'',
+        //活动链接
         link:'',
         detailMsg:'',
         logoUrl:'',
@@ -89,7 +91,8 @@ import Footer from '../../components/Footer'
       getEventSetail(){
         let webId = this.$route.params.pathMatch
         console.log(this.$route)
-        this.$http.get('/event-service/event/info/'+webId).then(res => {
+        // this.$http.get('/event-service/event/info/'+webId).then(res => {
+          getEventInfo(webId).then( res =>{
           if(res.data.rspCode == 1){
             let data = res.data.data
             console.log(data)

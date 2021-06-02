@@ -29,6 +29,7 @@
 import {langEn,langZh} from '@/api/lang.js'
 import { Toast } from 'vant';
 // import api from '@/api/api'
+import {postSignup} from '@/api/userService'
     export default {
         data(){
             return{
@@ -54,7 +55,8 @@ import { Toast } from 'vant';
                 if (this.isClick) {
                     
                     if (/^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(this.phone)) {
-                        this.$http.post("/user-service/auth/send?target="+this.phone+"&type=PHONE_LOGIN").then(res =>{
+                        // this.$http.post("/user-service/auth/send?target="+this.phone+"&type=PHONE_LOGIN").then(res =>{
+                            postSignup(this.phone).then(res =>{
                             console.log(res)
                         })
                         this.isClick = false

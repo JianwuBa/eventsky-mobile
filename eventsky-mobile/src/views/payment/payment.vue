@@ -10,7 +10,7 @@
         </div>
         <section class="middle-tic">
             <h5 class="sec-tit">门票信息</h5>
-            <div class="sec-content" v-for="(item ,index) in ticArr" :key="index">
+            <div class="sec-content" v-for="(item ,index) in ticArr" :key="index" >
                 <p class="name">{{item.title}} </p>
                 <p class="price">售价：{{item.currency | filterCurrency}} {{item.amount}}</p>
             </div>
@@ -65,6 +65,9 @@
 
 <script>
 import Head from '../../components/Head'
+import {postOrderCreate} from '@/api/orderService'
+import {getInfoPayment} from "@/api/eventService"
+import qs from 'qs'
     export default {
         data(){
             return{
@@ -131,7 +134,8 @@ import Head from '../../components/Head'
         },
         methods:{
             getAccountInfo(){
-                this.$http.get('/event-service/event/info/'+this.eventId).then(res => {
+                // this.$http.get('/event-service/event/info/'+this.eventId).then(res => {
+                getInfoPayment(this.eventId).then(res => {
                     if(res.data.rspCode == '1'){
                         let data = res.data.data
                         console.log(data)
@@ -178,15 +182,15 @@ import Head from '../../components/Head'
                 return obj
             },
             submitForm(formName) {
-                const formData = new FormData();
-                Object.keys(this.createOrder()).forEach((key) => {
-                    formData.append(key, this.createOrder()[key]);
-                });
-                
                 
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                       this.$http.post("/order-service/order/create",formData).then(res =>{
+                        const formData = new FormData();
+                        Object.keys(this.createOrder()).forEach((key) => {
+                            formData.append(key, this.createOrder()[key]);
+                        });
+                        // this.$http.post("/order-service/order/create",formData).then(res =>{
+                        postOrderCreate(qs.stringify(this.createOrder())).then(res =>{
                             if(res.data.rspCode == 1){
                                 this.orderNo = res.dadta.orderNo
                             }
