@@ -10,14 +10,25 @@ VueRouter.prototype.push = function push(location) {
 Vue.use(VueRouter)
 const router = new VueRouter({
     routes: [{
-        path: '/live',
-        component: () =>
-            import ('@/views/live/index'),
-        children: [{
-            path: "/live/*",
+            path: '/live',
             component: () =>
-                import ("@/views/live/index"),
-        }]
-    }]
+                import ('@/views/live/index'),
+            children: [{
+                path: "/live/*",
+                component: () =>
+                    import ("@/views/live/index"),
+            }]
+        },
+        {
+            path: '/viewlive',
+            component: () =>
+                import ('@/views/live/viewLive'),
+            children: [{
+                path: "/viewlive/*",
+                component: () =>
+                    import ("@/views/live/viewLive"),
+            }]
+        }
+    ]
 })
 export default router

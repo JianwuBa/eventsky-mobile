@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div ref="live" class="live">
+        <div ref="page" class="live">
             <div id="local-player" class="player-box">
                 <div class="player-btn" @click="livePrestart" v-if="isLive">
                     <img src="@/assets/images/video-start.png" class="video" alt="">
@@ -15,7 +15,10 @@
 <script>
 import {postPrestart,postSkyStartLive,postSkyEndLive} from '@/api/liveService.js'
 import AgoraRTC from "agora-rtc-sdk-ng"
+
+import {MixIns} from "@/api/mixins.js"
     export default {
+        mixins:[MixIns],
         data(){
             return{
                 //直播按钮
@@ -76,15 +79,19 @@ import AgoraRTC from "agora-rtc-sdk-ng"
                         this.uid = data.uid
                         this.lhid = data.historyId
                         this.token = data.token
+                        this.lives()
                     }
                 })
-                try {
-                    await this.startLive();
+            },
+
+            async lives(){
+                 try {
+                    await this.startLive()
                     //开始直播
-                    await this.skyStartLive();
+                    // this.skyStartLive()
                     //volumeAnimation = requestAnimationFrame(setVolumeWave);
                     this.isLive = false
-                } 
+                }
                 catch (error) {
                     console.error('start live failed!');
                     console.error(error);
@@ -97,7 +104,6 @@ import AgoraRTC from "agora-rtc-sdk-ng"
                     errMsg += "\n详细错误信息\n" + error;
                     alert(errMsg);
                 } finally {
-                    
                     //$("#btn-stop-live").attr("disabled", false);
                     //$("#enable-beauty").attr("disabled", false);
                     //$("#disable-beauty").attr("disabled", true);
@@ -105,23 +111,24 @@ import AgoraRTC from "agora-rtc-sdk-ng"
             },
             //声网开始直播
             async startLive() {
+                console.log("startlive")
                 // create Agora client
                 this.client.setClientRole(this.role);
                 console.log(this.appid, this.channel, this.token,this.uid)
                 // join the channel
                 this.uid = await this.client.join(this.appid, this.channel, this.token || null, this.uid);
-
+                console.log("end-join:"+this.uid)
                 // create local audio and video tracks
                 this.localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
                 this.localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack({ encoderConfig: this.curVideoProfile.value });
                 this.localTracks.audioTrack.setVolume(200);
                 const level = this.localTracks.audioTrack.getVolumeLevel();
                 console.log("local stream audio level", level);
-                // play local video track
+                // // play local video track
                 this.localTracks.videoTrack.play("local-player");
                 
-                //$("#local-player-name").text(`localTrack(${options.uid})`);
-                // publish local tracks to channel
+                // //$("#local-player-name").text(`localTrack(${options.uid})`);
+                // // publish local tracks to channel
                 await this.client.publish([this.localTracks.audioTrack, this.localTracks.videoTrack]);
                 console.log("publish success");
                 // client.on("user-left", handleUserLeft);
@@ -141,8 +148,8 @@ import AgoraRTC from "agora-rtc-sdk-ng"
                 //initStats();
             },
             //活动星空开始直播
-            skyStartLive(){
-                postSkyStartLive(this.eventId,this.lhid).then(res => {
+             skyStartLive(){
+                 postSkyStartLive(this.eventId,this.lhid).then(res => {
                     console.log(res)
 
                     if(res.data.rspCode == 1){
@@ -184,16 +191,6 @@ import AgoraRTC from "agora-rtc-sdk-ng"
                 })
             }
         },
-        mounted(){
-           this.clientHeight = `${document.documentElement.clientHeight}`;
-           let that = this
-           window.onresize = function(){
-                that.clientHeight =  `${document.documentElement.clientHeight}`;
-                if(that.$refs.live){
-                    that.$refs.live.style.minHeight = that.clientHeight + 'px';
-                }
-            }
-        },
         created(){
             this.eventId = this.$route.params.pathMatch
 
@@ -207,11 +204,6 @@ import AgoraRTC from "agora-rtc-sdk-ng"
             }
             this.initVideoProfiles();
         },
-        watch:{
-            clientHeight(clientHeight){
-               this.$refs.live.style.minHeight = clientHeight + 'px';
-            }
-        }
     }
 </script>
 

@@ -21,3 +21,8 @@ export function postSkyStartLive(id, lhid) {
 export function postSkyEndLive(id, lhid) {
     return http.post(`${resquest}/live/end/` + id + '?historyId=' + lhid)
 }
+
+// 直播信息  观众端
+export function getLiveViews(id) {
+    return http.get(`${resquest}/live/audience/` + id)
+}

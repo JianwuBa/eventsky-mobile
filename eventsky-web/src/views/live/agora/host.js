@@ -26,7 +26,7 @@ var curVideoProfile;
 
 // Agora client options
 var options = {
-    appid: "801622c1066b4b37a385d42aa8f11032",
+    appid: "",
     channel: "", //webId
     uid: 0,
     lhid: 0,
