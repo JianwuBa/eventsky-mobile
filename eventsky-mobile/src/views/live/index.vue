@@ -8,13 +8,13 @@
           height="100%"
           fit="cover"
           :src="bannelUrl"
-         
+          v-if="false"
         />
+        <Live></Live>
       </div>
       <div class="event-info">
         <p class="name">{{title}}</p>
-        <p class="date">{{beginDate}}</p>
-        <p class="organizer">主办：{{company}}</p>
+       
         <div class="link">
           <div class="left">
             <span>活动链接：</span>
@@ -25,22 +25,7 @@
           </div>
         </div>
       </div>
-      <section class="event-detail">
-        <h3 class="sec-tit">
-      
-          <p>详情介绍</p>
-          <p class="views">浏览：{{views}}</p>
-        </h3>
-        <div class="event-detail-content" ref="detail" :class="{'heightAuto':showEventDetail,'heightNum':!showEventDetail}">
 
-          <div v-html="detailMsg"></div>
-        </div>
-        <div @click="showetail" class="showEventDetail" v-if="showArrow">
-          <van-icon name="arrow-down" v-if="!showEventDetail" ></van-icon>
-          <van-icon name="arrow-up" v-if="showEventDetail" ></van-icon>
-        </div>
-        
-      </section>
       <section class="event-sponsor">
         <h3 class="sec-tit">
           <p>主办方</p>
@@ -62,9 +47,11 @@
 import Head from '../../components/Head'
 import Footer from '../../components/Footer'
 import {getEventInfo} from '@/api/eventService'
+import Live from './player'
   export default {
     data(){
       return{
+        eventId:'',
         show:false,
         //活动链接
         url:'http://192.168.1.216:8080/#',
@@ -72,14 +59,15 @@ import {getEventInfo} from '@/api/eventService'
         showArrow:null,
         bannelUrl:'',
         title:'',
-        beginDate:'',
         //活动链接
         link:'',
-        detailMsg:'',
+       
         logoUrl:'',
         company:'',
         views:'',
-        barcodeUrl:''
+        barcodeUrl:'',
+
+
       }
     },
    
@@ -90,46 +78,37 @@ import {getEventInfo} from '@/api/eventService'
       showetail(){
         this.showEventDetail = !this.showEventDetail
       },
-      getEventSetail(){
-        let webId = this.$route.params.pathMatch
-        console.log(this.$route)
+      async getEventSetail(){
+        
         // this.$http.get('/event-service/event/info/'+webId).then(res => {
-          getEventInfo(webId).then( res =>{
+           getEventInfo(this.eventId).then( res =>{
           if(res.data.rspCode == 1){
             let data = res.data.data
             console.log(data)
             this.bannelUrl = data.bannelUrl
-            this.title = data.title
-            this.beginDate = data.beginDate
             this.link = this.url+this.$route.path
-            this.detailMsg = data.detail
             this.logoUrl = data.logoUrl
+            this.title = data.title
             this.company = data.company
             this.views = data.views
             this.barcodeUrl=data.barcodeUrl
+            this.eventId = data.webId
           }
         })
+        
       }
     },
     components:{
       Head,
       Footer,
-
+    Live
     },
     created(){
-      
-      this.getEventSetail()
+        this.eventId = this.$route.params.pathMatch
+        this.getEventSetail()
+            
     },
-    updated(){
-      let dtailHeight= this.$refs.detail.offsetHeight; 
-      console.log(dtailHeight)
-      if(dtailHeight < 168){
-        this.showArrow = false
-        this.showEventDetail = true
-      } else {
-        this.showArrow = true
-      }
-    },
+  
     
   }
 </script>

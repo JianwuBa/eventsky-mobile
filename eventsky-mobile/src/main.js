@@ -20,7 +20,9 @@ import 'vant/lib/index.css';
 Vue.use(Vant);
 Vue.use(elementUi)
 Vue.config.productionTip = false
-
+    //直播引入jquery
+import $ from 'jquery'
+Vue.prototype.$ = $;
 new Vue({
     render: h => h(App),
     i18n,

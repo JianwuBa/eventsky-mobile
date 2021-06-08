@@ -43,6 +43,16 @@ const router = new VueRouter({
             path: '/client',
             component: () =>
                 import ('@/views/client/index')
+        },
+        {
+            path: '/live',
+            component: () =>
+                import ('@/views/live/index'),
+            children: [{
+                path: "/live/*",
+                component: () =>
+                    import ("@/views/live/index"),
+            }]
         }
 
     ]

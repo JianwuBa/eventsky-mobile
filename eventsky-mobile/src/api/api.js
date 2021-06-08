@@ -9,7 +9,7 @@ let eventResquest = "/event-service/"
     // get请求
 export default {
     getEventAPI(id) {
-        return http.get(`${eventResquest}/id` + id)
+        return http.get(`${eventResquest}/` + id, params)
     },
     sendVerifyCode(params) {
         return http.post(`${userResquest}/auth/send`, params)
