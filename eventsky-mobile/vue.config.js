@@ -7,6 +7,7 @@ module.exports = {
             '/': {
                 // target指的是代理地址，需要代理请求的地址
                 target: 'http://192.168.1.166:9090',
+                // target: 'https://gw.eventsky.cn',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/': '/'

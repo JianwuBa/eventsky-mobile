@@ -54,7 +54,7 @@ import Live from './player'
         eventId:'',
         show:false,
         //活动链接
-        url:'http://192.168.1.216:8080/#',
+        url:'https://eventsky.cn/',
         showEventDetail:false,
         showArrow:null,
         bannelUrl:'',
