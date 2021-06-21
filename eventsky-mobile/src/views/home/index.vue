@@ -82,7 +82,6 @@ import {getEventInfo} from '@/api/eventService'
         barcodeUrl:''
       }
     },
-   
     methods:{
       showCode(){
         this.show = true
@@ -117,7 +116,6 @@ import {getEventInfo} from '@/api/eventService'
 
     },
     created(){
-      
       this.getEventSetail()
     },
     updated(){

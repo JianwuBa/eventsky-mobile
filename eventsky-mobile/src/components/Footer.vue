@@ -5,17 +5,21 @@
 </template>
 
 <script>
+import {getSingUp} from "@/api/userService.js"
     export default {
+
         methods:{
             login(){
                 let eventId = this.$route.params.pathMatch
-                this.$http.get("/user-service/account/current").then(res => {
+                // this.$http.get("/user-service/account/current").then(res => {
+                getSingUp().then(res => {
                     console.log(res)
-                    if(res.data.rspCode == "400002"){
-                        this.$router.push('/login')
-                    }else if(res.data.rspCode == "1"){
-                        this.$router.push('/payment/'+eventId+'')
-                    }
+                    // if(res.data.rspCode == "400002"){
+                    //     this.$router.push('/login')
+                    // }else if(res.data.rspCode == "1"){
+                    //     this.$router.push('/payment/'+eventId+'')
+                    // }
+                    this.$router.push('/payment/'+eventId+'')
                 })
                 //this.$router.push('/login')
             }

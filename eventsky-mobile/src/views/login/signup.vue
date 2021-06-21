@@ -29,7 +29,7 @@
 import {langEn,langZh} from '@/api/lang.js'
 import { Toast } from 'vant';
 // import api from '@/api/api'
-import {postSignup} from '@/api/userService'
+import {postSignup} from '@/api/userService.js'
     export default {
         data(){
             return{

@@ -8,9 +8,9 @@
                 <p class="time">{{eventTime}}</p>
             </div>
         </div>
-        <section class="middle-tic">
+        <section class="middle-tic" v-if="ticArr">
             <h5 class="sec-tit">门票信息</h5>
-            <div class="sec-content" v-for="(item ,index) in ticArr" :key="index" >
+            <div class="sec-content" v-for="(item ,index) in ticArr" :key="index">
                 <p class="name">{{item.title}} </p>
                 <p class="price">售价：{{item.currency | filterCurrency}} {{item.amount}}</p>
             </div>
@@ -32,6 +32,7 @@
                         <el-input v-model="infoForm.position" ></el-input>
                     </el-form-item>
                     
+       
                     <el-row v-for="(item,idx) in infoForm.questionList" :key="idx">
                         <el-col :span="24" >
                             <el-form-item 
@@ -57,6 +58,7 @@
                     <el-form-item>
                         <el-button class="payment-btn" @click="submitForm('infoForm')" >付款</el-button>
                     </el-form-item>
+                    
                 </el-form>
             </div>
         </section>
@@ -67,7 +69,7 @@
 import Head from '../../components/Head'
 import {postOrderCreate} from '@/api/orderService'
 import {getInfoPayment} from "@/api/eventService"
-import qs from 'qs'
+// import qs from 'qs'
     export default {
         data(){
             return{
@@ -136,6 +138,7 @@ import qs from 'qs'
             getAccountInfo(){
                 // this.$http.get('/event-service/event/info/'+this.eventId).then(res => {
                 getInfoPayment(this.eventId).then(res => {
+                    console.log(res)
                     if(res.data.rspCode == '1'){
                         let data = res.data.data
                         console.log(data)
@@ -182,17 +185,19 @@ import qs from 'qs'
                 return obj
             },
             submitForm(formName) {
-                
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        const formData = new FormData();
-                        Object.keys(this.createOrder()).forEach((key) => {
-                            formData.append(key, this.createOrder()[key]);
-                        });
+                        // const formData = new FormData();
+                        // Object.keys(this.createOrder()).forEach((key) => {
+                        //     formData.append(key, this.createOrder()[key]);
+                        // });
                         // this.$http.post("/order-service/order/create",formData).then(res =>{
-                        postOrderCreate(qs.stringify(this.createOrder())).then(res =>{
+                        postOrderCreate(this.createOrder()).then(res =>{
+                            console.log(res)
                             if(res.data.rspCode == 1){
-                                this.orderNo = res.dadta.orderNo
+                                this.orderNo = res.data.data.orderNo
+                                // window.location.href = 'http://192.168.1.250:9090/order-service/payment/pay/' +this.orderNo
+                                window.location.href = 'https://order.eventsky.cn/payment/pay/' +this.orderNo
                             }
                         })
                     } else {

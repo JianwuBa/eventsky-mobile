@@ -25,8 +25,9 @@
 <script>
 import {langEn,langZh} from '@/api/lang.js'
 import { Toast } from 'vant';
+import Cookies from 'js-cookie'
 // import {postLogin} from "@/api/"
-import {postLogin} from '@/api/userService'
+import {postLogin,postGetPhoneCode} from '@/api/userService.js'
     export default {
         data(){
             return{
@@ -50,7 +51,9 @@ import {postLogin} from '@/api/userService'
                 if (this.isClick) {
                     
                     if (/^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(this.phone)) {
-                        this.$http.post("/user-service/auth/send?target="+this.phone+"&type=PHONE_LOGIN").then(res =>{
+
+                        // this.$http.post("/user-service/auth/send?target="+this.phone+"&type=PHONE_LOGIN").then(res =>{
+                        postGetPhoneCode(this.phone).then(res => {
                             console.log(res)
                         })
                         this.isClick = false
@@ -76,10 +79,15 @@ import {postLogin} from '@/api/userService'
             registerAccount(){
                 // this.$http.post("/user-service/account/login_p?phone="+this.phone+"&authCode="+this.sms+"").then(res =>{
                     postLogin(this.phone,this.sms).then(res => {
+
                     if(res.data.rspCode == 1){
-                        setTimeout(()=>{
-                            this.$router.push('/payment')
-                        },1000)
+                        console.log(res)
+                        let token = res.data.data
+                            Cookies.set('skyToken', token);
+                            
+                        // setTimeout(()=>{
+                        //     this.$router.push('/payment')
+                        // },1000)
                     }
                 })
             }
